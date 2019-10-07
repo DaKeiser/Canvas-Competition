@@ -9,19 +9,119 @@
 <script>
 
     // Declare all global variables here
+    const BG = "#000000";
+    const GBG = "#FFFFFF";
+    // const elasticity = 0.1;
+    const gravity = 0.25;
+    const dampening = 0.995;
+    const pullStrength = 0.005;
+    const radius = 10;
+    const boundX1 = canvas.width/5;
+    const boundY1 = canvas.height/5;
+    const boundX2 = 4*canvas.width/5;
+    const boundY2 = 4*canvas.height/5;
+    var ballX;
+    var ballY;
+    var vX;
+    var vY;
 
     // Declare custom functions here
 
+    function setup()
+    {
+        ballX = canvas.width/2;
+        ballY = canvas.height/2;
+        vX = 0;
+        vY = 0;
+    }
+
+    function check(x, y)
+    {
+        if ((x<=boundX2 || x>=boundX1) && (y<=boundY2 || y>=boundY1))
+        {
+            return 1;
+        }
+        else 
+        {
+            return 0;
+        }
+    }
+
+    function moveBall()
+    {
+        //Factors that affect the movement of ball
+        //Mouse on both X and Y
+        //Elasticity on X and Y
+        //Gravity on Y
+
+        if(canvas.mouseDown)
+        {
+            var pullLength = Math.sqrt(Math.pow((ballX - canvas.mouseX), 2) + Math.pow((ballY - canvas.mouseY), 2));
+            
+            //velocity of ball depends on force, so must change it here
+            vX += (pullStrength*(ballX - canvas.mouseX));
+            vY += (pullStrength*(ballY - canvas.mouseY));
+        }
+        
+        //vY depends on gravity so change it too
+        vY += gravity;
+        
+        // Execute dampening (slowing down)
+        vX *= dampening;
+        vY *= dampening;
+
+        //Top
+        if(ballY - radius < boundY1){
+            ballY = boundY1 + radius;
+            vY = Math.abs(vY);
+        } 
+        //Bottom
+        else if(ballY + radius > boundY2)
+        {
+            ballY = boundY2 - radius;
+            vY = - Math.abs(vY);
+        }
+  
+        //Left
+        if(ballX - radius < boundX1){
+            ballX = boundX1 + radius;
+            vY = Math.abs(vY);
+        }
+        //Right
+        else if(ballX + radius > boundX2){
+            ballX = boundX2 - radius;
+            vY = - Math.abs(vY);
+        }
+
+        //Position changes with change in velocity
+        ballX += vX;
+        ballY += vY;  
+    }
 
     // Function while will be called repeatedly 
     function main() {
         canvas.clear();
-        dra
         
+        canvas.setDrawMode("fill");
+        canvas.setColor(BG);
+        canvas.drawRectangle(0, 0, canvas.width, canvas.height);
+
+        canvas.setDrawMode("fill");
+        canvas.setColor(GBG);
+        canvas.drawRectangle(canvas.width/5, canvas.height/5, 3*canvas.width/5, 3*canvas.height/5);   
+        
+        canvas.setDrawMode("fill");
+        canvas.setColor("#000000");
+        canvas.drawCircle(ballX, ballY, radius);
+
+        canvas.drawText(canvas.width/2, canvas.height/2, ballX+" "+ballY, fontSize = 30);
+        moveBall();
+                
     }
 
     // Override functions here; 
     canvas.mainFunction = main;
+    canvas.setupFunction = setup;
 
     var timeStep = 50;
     canvas.startMain(timeStep);
@@ -29,6 +129,3 @@
 
     
 </script>
-
-
-
